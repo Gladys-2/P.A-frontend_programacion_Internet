@@ -4,13 +4,13 @@ import type { Animal, Usuario } from "../../types/types";
 import BandejaAnimales from "../../componentes/Bandejas/BandejasAnimales";
 import ModalAnimal from "../../componentes/Modal/ModalAnimal";
 
-interface AnimalesProps {
+interface AnimalesAdminProps {
   usuarioLogueado: Usuario;
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const Animales: React.FC<AnimalesProps> = ({ usuarioLogueado }) => {
+const AnimalesAdmin: React.FC<AnimalesAdminProps> = ({ usuarioLogueado }) => {
   const [animales, setAnimales] = useState<Animal[]>([]);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [animalSeleccionado, setAnimalSeleccionado] = useState<Animal | null>(null);
@@ -63,14 +63,27 @@ const Animales: React.FC<AnimalesProps> = ({ usuarioLogueado }) => {
   };
 
   return (
-    <div className="p-4">
-      <BandejaAnimales
-        animales={animales}
-        usuarioLogueado={usuarioLogueado}
-        onEdit={handleEditar}
-        onAdd={handleAgregar}
-        onToggle={handleToggleEstado}
-      />
+    <div className="w-full min-h-screen bg-black p-6">
+      <h1 className="text-3xl font-bold text-white mb-8 text-center">
+        Animales registrados
+      </h1>
+
+      {/* Contenedor con borde brillante */}
+      <div className="relative p-2 rounded-3xl">
+        {/* Brillo alrededor de la tabla */}
+        <span className="absolute inset-0 rounded-3xl bg-linear-to-r from-cyan-400 via-purple-500 to-pink-400 opacity-30 blur-2xl animate-pulse pointer-events-none"></span>
+
+        {/* Contenido de la tabla */}
+        <div className="relative z-10">
+          <BandejaAnimales
+            animales={animales}
+            usuarioLogueado={usuarioLogueado}
+            onEdit={handleEditar}
+            onAdd={handleAgregar}
+            onToggle={handleToggleEstado}
+          />
+        </div>
+      </div>
 
       {modalAbierto && (
         <ModalAnimal
@@ -83,4 +96,4 @@ const Animales: React.FC<AnimalesProps> = ({ usuarioLogueado }) => {
   );
 };
 
-export default Animales;
+export default AnimalesAdmin;
