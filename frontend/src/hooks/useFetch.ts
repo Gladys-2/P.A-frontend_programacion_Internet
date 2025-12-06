@@ -1,36 +1,29 @@
 import { useState, useEffect } from "react";
-import type { AxiosRequestConfig } from "axios";
-import axios from "axios";
 
-type UseFetchResult<T> = {
-  data: T | null;
-  loading: boolean;
-  error: string | null;
-  refetch: () => void;
-};
-
-export function useFetch<T>(url: string, config?: AxiosRequestConfig): UseFetchResult<T> {
+export const useFetch = <T>(url: string) => {
   const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get<T>(url, config);
-      setData(response.data);
-    } catch (err: any) {
-      console.error("Error en useFetch:", err);
-      setError(err.response?.status ? `Error ${err.response.status}` : "Error desconocido");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    if (!url) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Error al obtener datos");
+        const json: T = await res.json();
+        setData(json);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData();
   }, [url]);
 
-  return { data, loading, error, refetch: fetchData };
-}
+  return { data, loading, error };
+};
