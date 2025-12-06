@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { IdiomaProvider } from "../src/context/idiomaContext";
+import React, { useState, useEffect } from "react";
+import { IdiomaProvider } from "./context/idiomaContext";
 import Login from "./pages/Login/Login";
 import Registro from "./pages/Login/Registro";
 import type { Usuario, Pantalla } from "./types/types";
 
-// Administrador
+// Admin
 import InicioAdmin from "./pages/Admin/InicioAdmin";
 import Usuarios from "./pages/Admin/Usuarios";
 import AnimalesAdmin from "./pages/Admin/AnimalesAdmin";
@@ -20,12 +20,10 @@ import VoluntariosUsuario from "./pages/Usuario/Voluntarios";
 import AdopcionesUsuario from "./pages/Usuario/Adopciones";
 import DonacionesUsuario from "./pages/Usuario/donaciones";
 
-import InicioPublico from "../src/componentes/InicioContenido";
-
+import InicioPublico from "./componentes/InicioContenido";
 import Navbar from "./componentes/Navbar";
 import Sidebar from "./componentes/Sidebar";
 import i18n from "./i18n";
-import "./i18n";
 
 const App: React.FC = () => {
   const [usuarioActual, setUsuarioActual] = useState<Usuario | null>(null);
@@ -37,13 +35,23 @@ const App: React.FC = () => {
   }, [i18n.language]);
 
   const handleLoginExitoso = (usuario: Usuario) => {
-    setUsuarioActual(usuario);
-    setPantalla("inicio");
+    // Asignamos rol válido si viene nulo o undefined
+    const rolValido: "usuario" | "administrador" =
+      usuario.id === 3 ? "administrador" : "usuario";
+
+    const usuarioConRol = { ...usuario, rol: rolValido };
+
+    setUsuarioActual(usuarioConRol);
+
+    // Guardar en localStorage (opcional)
+    localStorage.setItem("usuario", JSON.stringify(usuarioConRol));
+
+    // Cambiar pantalla según rol
+    setPantalla(rolValido === "administrador" ? "inicioAdmin" : "inicio");
   };
 
   const handleSalir = () => {
     localStorage.clear();
-    sessionStorage.clear();
     setUsuarioActual(null);
     setPantalla("inicioPublico");
   };
@@ -98,21 +106,16 @@ const App: React.FC = () => {
       />
 
       {!usuarioActual ? (
-        <main className="pt-20 px-6 w-full">
+        <main className="pt-0 px-0 w-full">
           {pantalla === "inicioPublico" && <InicioPublico sidebarAbierto={false} />}
           {pantalla === "login" && (
-            <Login
-              mostrarRegistro={() => setPantalla("registro")}
-              onLoginExitoso={handleLoginExitoso}
-            />
+            <Login mostrarRegistro={() => setPantalla("registro")} onLoginExitoso={handleLoginExitoso} />
           )}
-          {pantalla === "registro" && (
-            <Registro mostrarLogin={() => setPantalla("login")} />
-          )}
+          {pantalla === "registro" && <Registro mostrarLogin={() => setPantalla("login")} />}
         </main>
       ) : (
         <div className="flex w-full min-h-screen">
-          {/* sidebar */}
+          {/* Sidebar */}
           <Sidebar
             abierto={sidebarAbierto}
             toggleSidebar={() => setSidebarAbierto(!sidebarAbierto)}
@@ -121,12 +124,8 @@ const App: React.FC = () => {
             handleSalir={handleSalir}
           />
 
-          {/* contenido principal */}
-          <div
-            className={`flex-1 transition-all duration-300 ${
-              sidebarAbierto ? "ml-60" : "ml-0"
-            }`}
-          >
+          {/* Contenido principal */}
+          <div className={`flex-1 transition-all duration-300 ${sidebarAbierto ? "ml-60" : "ml-0"}`}>
             <main className="pt-20 px-6 w-full">
               {usuarioActual.rol === "administrador"
                 ? renderContenidoAdmin()
