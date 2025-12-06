@@ -4,12 +4,11 @@ import { FaHeart, FaRegHeart, FaPaw } from "react-icons/fa";
 import type { Animal, Usuario } from "../../types/types";
 
 const COLOR_TITULO = "#1E3A8A";
-const COLOR_BOTON = "#4DA6FF";
-const COLOR_BOTON_HOVER = "#3399FF";
-const COLOR_VERDE = "#8AA85B";
+const COLOR_BOTON = "#14B8A6";
+const COLOR_BOTON_HOVER = "#0D9488"; 
+const COLOR_VERDE = "#4CAF50";
 const COLOR_CORAL = "#FF7E6B";
-const COLOR_AMARILLO = "#FFC107"; 
-const COLOR_FONDO = "#E6F7FF";
+const COLOR_AMARILLO = "#FFC107";
 
 const styleBotonAdoptar = `mt-4 w-full py-3 rounded-xl text-white font-semibold transition-all duration-300 shadow-md focus:outline-none focus:ring-4 focus:ring-opacity-50`;
 
@@ -24,7 +23,6 @@ const AnimalesUsuario: React.FC<AnimalesUsuarioProps> = ({ usuario }) => {
   const [cargando, setCargando] = useState(true);
   const [likes, setLikes] = useState<Record<number, { liked: boolean; count: number }>>({});
 
-  // Cargar animales desde backend
   const cargarAnimales = async () => {
     try {
       const res = await fetch(`${API_URL}/animales`);
@@ -44,7 +42,6 @@ const AnimalesUsuario: React.FC<AnimalesUsuarioProps> = ({ usuario }) => {
     setLikes(guardado);
   }, []);
 
-  // Likes
   const toggleLike = (id?: number) => {
     if (id === undefined) return;
 
@@ -69,7 +66,6 @@ const AnimalesUsuario: React.FC<AnimalesUsuarioProps> = ({ usuario }) => {
     localStorage.setItem("likes", JSON.stringify(nuevoLikes));
   };
 
-  // Solicitar adopción
   const solicitarAdopcion = async (animalId: number) => {
     try {
       const res = await fetch(`${API_URL}/adopciones/crear-adopcion`, {
@@ -99,18 +95,18 @@ const AnimalesUsuario: React.FC<AnimalesUsuarioProps> = ({ usuario }) => {
   const getColorEstado = (estado: string) => {
     switch (estado) {
       case "Disponible":
-        return { bg: `${COLOR_VERDE}20`, color: COLOR_VERDE };
+        return { bg: "#E0F7FA", color: COLOR_VERDE, shadow: "0 0 10px #4CAF5070" };
       case "Adoptado":
-        return { bg: "#FEE2E2", color: COLOR_CORAL };
+        return { bg: "#FFE0E0", color: COLOR_CORAL, shadow: "0 0 10px #FF7E6B70" };
       case "En cuidado":
-        return { bg: `${COLOR_AMARILLO}30`, color: COLOR_AMARILLO };
+        return { bg: "#FFF8E1", color: COLOR_AMARILLO, shadow: "0 0 10px #FFC10770" };
       default:
-        return { bg: "#E5E7EB", color: "#6B7280" };
+        return { bg: "#F0F0F0", color: "#6B7280", shadow: "0 0 8px #6B728070" };
     }
   };
 
   return (
-    <div className="p-6 min-h-screen" style={{ backgroundColor: COLOR_FONDO }}>
+    <div className="p-6 min-h-screen bg-white">
       <h2 className="text-4xl font-serif font-extrabold text-center mb-16 pt-8" style={{ color: COLOR_TITULO }}>
         Albergue Patitas Felices – Animales
       </h2>
@@ -118,10 +114,10 @@ const AnimalesUsuario: React.FC<AnimalesUsuarioProps> = ({ usuario }) => {
       {categorias.map(cat => (
         <div key={cat} className="mb-16">
           <h3 className="text-3xl font-bold capitalize mb-8 flex items-center" style={{ color: COLOR_TITULO }}>
-            <FaPaw className="mr-3 text-2xl text-blue-400" /> {cat}s en Adopción
+            <FaPaw className="mr-3 text-2xl text-pink-400" /> {cat}s en Adopción
           </h3>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {animales
               .filter(a => (a.especie?.toLowerCase() || "") === cat)
               .map((a, i) => {
@@ -134,8 +130,8 @@ const AnimalesUsuario: React.FC<AnimalesUsuarioProps> = ({ usuario }) => {
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.08, duration: 0.5 }}
-                    whileHover={{ scale: 1.03, boxShadow: "0px 12px 25px rgba(0,0,0,0.15)" }}
-                    className="bg-white rounded-3xl overflow-hidden flex flex-col shadow-md cursor-pointer transition-shadow duration-300"
+                    whileHover={{ scale: 1.04, boxShadow: "0px 12px 25px rgba(0,0,0,0.2)" }}
+                    className="bg-white rounded-3xl overflow-hidden flex flex-col cursor-pointer border-2 border-transparent hover:border-teal-400 transition-all duration-300 shadow-lg"
                   >
                     <div className="overflow-hidden h-60 relative rounded-t-3xl">
                       <motion.img
@@ -146,24 +142,29 @@ const AnimalesUsuario: React.FC<AnimalesUsuarioProps> = ({ usuario }) => {
                       />
                       <button
                         onClick={e => { e.stopPropagation(); toggleLike(a.id); }}
-                        className="absolute top-4 right-4 text-white text-2xl drop-shadow-md z-10 p-2 rounded-full backdrop-blur-sm bg-black/20"
+                        className="absolute top-4 right-4 text-white text-2xl drop-shadow-md z-10 p-2 rounded-full backdrop-blur-sm bg-black/30"
                       >
                         {likedData.liked ? <FaHeart className="text-red-500" /> : <FaRegHeart className="text-white" />}
                       </button>
                     </div>
 
-                    <div className="p-5 flex-1 flex flex-col justify-between">
+                    <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
                       <div>
-                        <h4 className="text-2xl font-semibold mb-1" style={{ color: COLOR_TITULO }}>{a.nombre}</h4>
-                        <p className="text-gray-600 text-sm mb-2">
-                          Raza: {a.raza || "—"} | Edad: {a.edad ?? "—"} años
-                        </p>
-                        <p className="text-gray-600 text-sm italic mb-3 line-clamp-2">
-                          {a.descripcion || "Sin descripción disponible"}
-                        </p>
+                        <h4 className="text-2xl font-semibold mb-3" style={{ color: COLOR_TITULO }}>{a.nombre}</h4>
+
+                        {/* Datos separados */}
+                        <p className="text-gray-600 text-sm"><span className="font-semibold">Raza:</span> {a.raza || "—"}</p>
+                        <p className="text-gray-600 text-sm"><span className="font-semibold">Edad:</span> {a.edad ?? "—"} años</p>
+                        <p className="text-gray-600 text-sm"><span className="font-semibold">Sexo:</span> {a.sexo || "—"}</p>
+                        <p className="text-gray-600 text-sm"><span className="font-semibold">Tamaño:</span> {a.tamano || "—"}</p>
+                        <p className="text-gray-600 text-sm"><span className="font-semibold">Peso:</span> {a.peso ?? "—"} kg</p>
+
+                        <p className="text-gray-600 text-sm italic mt-2 line-clamp-2">{a.descripcion || "Sin descripción disponible"}</p>
+
+                        {/* Estado */}
                         <span
-                          style={{ backgroundColor: colorEstado.bg, color: colorEstado.color }}
-                          className="inline-block px-3 py-1 text-xs font-bold rounded-full"
+                          style={{ backgroundColor: colorEstado.bg, color: colorEstado.color, boxShadow: colorEstado.shadow }}
+                          className="inline-block px-3 py-1 text-xs font-bold rounded-full mt-2"
                         >
                           {a.estado_animal}
                         </span>
@@ -180,8 +181,8 @@ const AnimalesUsuario: React.FC<AnimalesUsuarioProps> = ({ usuario }) => {
                         Adoptar
                       </motion.button>
 
-                      <p className="mt-3 text-sm text-center text-gray-500 font-medium">
-                        {likedData.count} {likedData.count === 1 ? "Corazón" : "Corazones"} de interés
+                      <p className="mt-1 text-sm text-center text-gray-500 font-medium">
+                        {likedData.count} {likedData.count === 1 ? "Corazón" : "Corazones"}
                       </p>
                     </div>
                   </motion.div>
