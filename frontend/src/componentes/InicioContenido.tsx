@@ -10,9 +10,8 @@ const mascotasAdopcionHero = [
     {
         id: 1,
         tituloPrincipal: "ALBERGUE HUELLITAS",
-        subtituloPrincipal: "Huellitas",
         ubicacion: "Zona Bajo Llojeta, Calle 12 Los Nogales Curva N°3 #488.",
-        descripcion: "Huellitas es un refugio lleno de amor y alegría, donde cada peludito recibe cuidado, cariño y la oportunidad de encontrar un hogar para siempre. Ven a conocer a nuestros adorables compañeros y deja que su ternura te robe una sonrisa.",
+        descripcion: "Huellitas es un refugio donde cada peludito recibe cuidado y cariño, y encuentra la oportunidad de un hogar para siempre.",
         imagenFondo: "https://eju.tv/wp-content/uploads/2021/08/img_611a51b217a86.jpg",
         imagenTarjeta: "https://eju.tv/wp-content/uploads/2021/08/img_611a51b217a86.jpg",
     },
@@ -126,23 +125,23 @@ const InicioContenido: React.FC<InicioContenidoProps> = ({ sidebarAbierto }) => 
                 </AnimatePresence>
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
 
-                <div className="relative z-10 text-center text-white px-2 md:text-left md:px-1 max-w-2xl mb-5">
-                    <motion.span className="text-xl font-semibold tracking-wide uppercase text-orange-400">
+                <div className="relative z-20 text-derecha text-white px-2 md:text-left md:px-15 max-w-2xl mb-5">
+                    <motion.span className="text-xl font-semibold tracking-wide uppercase text-cyan-300">
                         {t(mascotaActiva.ubicacion)}
                     </motion.span>
-                    <motion.h1 className="text-5xl sm:text-8xl lg:text-7xl font-extrabold drop-shadow-lg leading-none">
+                    <motion.h1 className="text-3xl sm:text-8xl lg:text-7xl font-extrabold drop-shadow-lg leading-none">
                         {mascotaActiva.tituloPrincipal}
                     </motion.h1>
-                    <motion.h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold drop-shadow-lg leading-tight text-gray-200">
+                    <motion.h2 className="text-4xl sm:text-3xl lg:text-2xl font-extrabold drop-shadow-lg leading-tight text-gray-200">
                         {mascotaActiva.subtituloPrincipal}
                     </motion.h2>
-                    <motion.p className="mt-4 text-xl max-w-lg">
+                    <motion.p className="mt-5 text-xl max-w-lg">
                         {t(mascotaActiva.descripcion)}
                     </motion.p>
                 </div>
 
                 {/* Carrusel lateral */}
-                <div className="relative z-10 w-full lg:w-1/2 flex items-end justify-end space-x-4 lg:space-x-6 pb-4 md:pb-0">
+                <div className="relative z-50 w-full lg:w-1/2 flex items-end justify-end space-x-4 lg:space-x-6 pb-4 md:pb-0">
                     {mascotasAdopcionHero.map((mascota, index) => (
                         <motion.div
                             key={mascota.id}
@@ -179,7 +178,7 @@ const InicioContenido: React.FC<InicioContenidoProps> = ({ sidebarAbierto }) => 
             <section className="w-full py-20 bg-gray-100">
                 <div className="max-w-7xl mx-auto px-6 text-center">
                     <h2 className="text-5xl font-extrabold text-gray-800 mb-4 flex items-center justify-center gap-3">
-                        <FaHeart className="text-orange-500 text-4xl" />
+                        <FaHeart className="text-teal-500 text-4xl" />
                         {t("Nuestra Misión en Huellitas")}
                     </h2>
                     <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-12">{t("Nos dedicamos a transformar vidas, encontrando hogares amorosos para cada animal rescatado, y promoviendo la tenencia responsable.")}</p>
@@ -239,7 +238,7 @@ const InicioContenido: React.FC<InicioContenidoProps> = ({ sidebarAbierto }) => 
             {/* el carrusel del perro*/}
             <section className="relative w-full min-h-[700px] py-32 bg-linear-to-b from-white to-orange-50 flex flex-col items-center overflow-hidden border-t border-gray-200">
                 <h2 className="relative z-10 text-5xl font-extrabold text-gray-800 mb-4 flex items-center gap-3">
-                    <GiSittingDog className="text-orange-500 text-5xl" />
+                    <GiSittingDog className="text-white 500 text-5xl" />
                     {t("Listos para Adoptar")}
                 </h2>
                 <p className="relative z-10 text-xl text-gray-600 mb-12 text-center max-w-3xl">{t("Desliza para conocer a nuestros residentes más recientes y encuentra a tu nuevo mejor amigo.")}</p>
@@ -252,7 +251,7 @@ const InicioContenido: React.FC<InicioContenidoProps> = ({ sidebarAbierto }) => 
                                 <div className="p-6 flex flex-col justify-between h-auto min-h-[170px]">
                                     <div>
                                         <h3 className="text-2xl font-bold text-gray-900 mb-2">{perro.nombre}</h3>
-                                        <p className="text-orange-600 font-semibold text-base mb-2">{t("Edad")}: {perro.edad} | {t("Raza")}: {perro.raza}</p>
+                                        <p className="text-teal-500 font-semibold text-base mb-2">{t("Edad")}: {perro.edad} | {t("Raza")}: {perro.raza}</p>
                                         <p className="text-gray-600 text-sm line-clamp-none">{perro.descripcion}</p>
                                     </div>
                                 </div>
@@ -297,7 +296,7 @@ const InicioContenido: React.FC<InicioContenidoProps> = ({ sidebarAbierto }) => 
                     transition={{ duration: 1.2, ease: "easeOut" }}
                 >
                     <video
-                        src="../src/assets/videos/voluntario.mp4" // Aquí pon tu URL de video
+                        src="../src/assets/videos/voluntario.mp4" 
                         autoPlay
                         muted={false}
                         loop
@@ -315,7 +314,7 @@ const InicioContenido: React.FC<InicioContenidoProps> = ({ sidebarAbierto }) => 
                     viewport={{ once: true }}
                     transition={{ duration: 1.2, ease: "easeOut" }}
                 >
-                    <h2 className="text-4xl md:text-5xl font-extrabold text-orange-500 mb-6 flex items-center gap-3">
+                    <h2 className="text-4xl md:text-5xl font-extrabold text-teal-500 mb-6 flex items-center gap-3">
                         <FaHeart /> ¡Sé Voluntario!
                     </h2>
                     <p className="text-lg md:text-xl text-gray-700 mb-6">
