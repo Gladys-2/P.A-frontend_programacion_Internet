@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from "react";
-import type { Usuario } from "../../types/types.ts";
+import type { Usuario } from "../../types/types";
 import axios from "axios";
+import { FaUser, FaEnvelope, FaLock, FaPhone, FaIdCard } from "react-icons/fa";
 
 interface ModalProps {
   usuario: Usuario | null;
   usuarioLogueado: Usuario;
   onClose: () => void;
-  onSave: () => void; // refresca lista completa en Usuarios.tsx
+  onSave: () => void;
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const ModalUsuario: React.FC<ModalProps> = ({
-  usuario,
-  usuarioLogueado,
-  onClose,
-  onSave,
-}) => {
+const ModalUsuario: React.FC<ModalProps> = ({ usuario, usuarioLogueado, onClose, onSave }) => {
   const soyAdmin = usuarioLogueado.rol === "administrador";
 
   const [nombre, setNombre] = useState("");
@@ -56,27 +52,15 @@ const ModalUsuario: React.FC<ModalProps> = ({
     }
   }, [usuario]);
 
+  const soloLetrasInput = (val: string) => val.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
+  const soloNumerosInput = (val: string, maxLength: number) =>
+    val.replace(/[^0-9]/g, "").slice(0, maxLength);
+
   const handleSubmit = async () => {
     if (!soyAdmin) return;
 
-    const soloLetras = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
-    const soloNumeros = /^[0-9]+$/;
-
     if (!nombre || !apellidoPaterno || !apellidoMaterno || !correoElectronico || (!usuario?.id && !contrasena)) {
       alert("Por favor completa los campos obligatorios.");
-      return;
-    }
-
-    if (!soloLetras.test(nombre) || !soloLetras.test(apellidoPaterno) || !soloLetras.test(apellidoMaterno)) {
-      alert("Nombre y apellidos solo pueden contener letras.");
-      return;
-    }
-
-    const telefonoStr = telefono ? String(telefono) : "";
-    const cedulaStr = cedula ? String(cedula) : "";
-
-    if ((telefonoStr && !soloNumeros.test(telefonoStr)) || (cedulaStr && !soloNumeros.test(cedulaStr))) {
-      alert("Teléfono y cédula solo pueden contener números.");
       return;
     }
 
@@ -85,8 +69,8 @@ const ModalUsuario: React.FC<ModalProps> = ({
       apellido_paterno: apellidoPaterno,
       apellido_materno: apellidoMaterno,
       correo_electronico: correoElectronico,
-      telefono: telefonoStr,
-      cedula_identidad: cedulaStr,
+      telefono,
+      cedula_identidad: cedula,
       rol,
       estado,
       genero,
@@ -96,13 +80,25 @@ const ModalUsuario: React.FC<ModalProps> = ({
 
     try {
       setGuardando(true);
-      if (usuario?.id) {
-        await axios.put(`${API_URL}/usuarios/${usuario.id}`, payload);
-      } else {
-        await axios.post(`${API_URL}/usuarios/registro`, payload);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("No se encontró token de autenticación.");
+        return;
       }
 
-      onSave(); 
+      if (usuario?.id) {
+        // Editar usuario
+        await axios.put(`${API_URL}/usuarios/${usuario.id}`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } else {
+        // Crear usuario
+        await axios.post(`${API_URL}/usuarios/registro`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+
+      onSave();
       onClose();
     } catch (err) {
       console.error(err);
@@ -114,20 +110,68 @@ const ModalUsuario: React.FC<ModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 animate-fadeIn">
-      <div className="bg-white/90 backdrop-blur-md border border-gray-200 rounded-3xl w-11/12 max-w-xl p-8 flex flex-col gap-5 shadow-2xl animate-scaleIn">
+      <div className="bg-white/95 backdrop-blur-md border border-gray-200 rounded-3xl w-11/12 max-w-3xl p-8 flex flex-col gap-5 shadow-2xl animate-scaleIn">
         <h2 className="text-3xl font-bold text-gray-800 text-center mb-4">
           {usuario ? "Editar Usuario" : "Crear Usuario"}
         </h2>
 
-        <FloatingInput label="Nombre" value={nombre} onChange={setNombre} disabled={!soyAdmin || guardando} />
-        <FloatingInput label="Apellido Paterno" value={apellidoPaterno} onChange={setApellidoPaterno} disabled={!soyAdmin || guardando} />
-        <FloatingInput label="Apellido Materno" value={apellidoMaterno} onChange={setApellidoMaterno} disabled={!soyAdmin || guardando} />
-        <FloatingInput label="Correo Electrónico" type="email" value={correoElectronico} onChange={setCorreoElectronico} disabled={!soyAdmin || guardando} />
-        <FloatingInput label="Teléfono" value={telefono} onChange={setTelefono} disabled={!soyAdmin || guardando} />
-        <FloatingInput label="Cédula de Identidad" value={cedula} onChange={setCedula} disabled={!soyAdmin || guardando} />
-        {!usuario?.id && <FloatingInput label="Contraseña" type="password" value={contrasena} onChange={setContrasena} disabled={!soyAdmin || guardando} />}
+        <div className="grid grid-cols-2 gap-4">
+          <InputIcon
+            icon={<FaUser />}
+            label="Nombre"
+            value={nombre}
+            onChange={val => setNombre(soloLetrasInput(val))}
+            disabled={!soyAdmin || guardando}
+          />
+          <InputIcon
+            icon={<FaUser />}
+            label="Apellido Paterno"
+            value={apellidoPaterno}
+            onChange={val => setApellidoPaterno(soloLetrasInput(val))}
+            disabled={!soyAdmin || guardando}
+          />
+          <InputIcon
+            icon={<FaUser />}
+            label="Apellido Materno"
+            value={apellidoMaterno}
+            onChange={val => setApellidoMaterno(soloLetrasInput(val))}
+            disabled={!soyAdmin || guardando}
+          />
+          <InputIcon
+            icon={<FaEnvelope />}
+            label="Correo Electrónico"
+            type="email"
+            value={correoElectronico}
+            onChange={setCorreoElectronico}
+            disabled={!soyAdmin || guardando}
+          />
+          {!usuario?.id && (
+            <InputIcon
+              icon={<FaLock />}
+              label="Contraseña"
+              type="password"
+              value={contrasena}
+              onChange={setContrasena}
+              disabled={!soyAdmin || guardando}
+            />
+          )}
+          <InputIcon
+            icon={<FaPhone />}
+            label="Teléfono"
+            value={telefono}
+            onChange={val => setTelefono(soloNumerosInput(val, 10))}
+            disabled={!soyAdmin || guardando}
+          />
+          <InputIcon
+            icon={<FaIdCard />}
+            label="Cédula"
+            value={cedula}
+            onChange={val => setCedula(soloNumerosInput(val, 8))}
+            disabled={!soyAdmin || guardando}
+          />
+        </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 mt-4">
           <select value={rol} onChange={e => setRol(e.target.value as any)} className={selectStyle} disabled={!soyAdmin || guardando}>
             <option value="usuario">Usuario</option>
             <option value="administrador">Administrador</option>
@@ -165,7 +209,8 @@ const ModalUsuario: React.FC<ModalProps> = ({
   );
 };
 
-interface FloatingInputProps {
+interface InputIconProps {
+  icon: React.ReactNode;
   label: string;
   value: string;
   onChange: (val: string) => void;
@@ -173,19 +218,20 @@ interface FloatingInputProps {
   disabled?: boolean;
 }
 
-const FloatingInput: React.FC<FloatingInputProps> = ({ label, value, onChange, type = "text", disabled }) => {
+const InputIcon: React.FC<InputIconProps> = ({ icon, label, value, onChange, type = "text", disabled }) => {
   return (
-    <div className="relative w-full">
+    <div className="relative w-full flex items-center gap-2">
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{icon}</div>
       <input
         type={type}
         value={value}
         onChange={e => onChange(e.target.value)}
         disabled={disabled}
         placeholder=" "
-        className="peer border border-gray-300 px-4 pt-6 pb-2 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-shadow text-gray-900 z-10"
+        className="peer border border-gray-300 px-10 pt-4 pb-2 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-shadow text-gray-900 z-10"
       />
-      <label className={`absolute left-4 text-sm font-medium transition-all pointer-events-none
-          ${value ? "-top-2 text-cyan-400 bg-white px-1" : "top-3 text-gray-400 peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-400"}`}
+      <label className={`absolute left-10 text-sm font-medium transition-all pointer-events-none
+        ${value ? "-top-1 text-cyan-500 bg-white px-3" : "top-4 text-gray-500 peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500"}`}
       >
         {label}
       </label>
@@ -194,7 +240,7 @@ const FloatingInput: React.FC<FloatingInputProps> = ({ label, value, onChange, t
 };
 
 const selectStyle = "border border-gray-300 px-4 py-3 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-shadow";
-const buttonGuardar = "bg-cyan-500 hover:bg-cyan-500 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition transform hover:scale-105";
+const buttonGuardar = "bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition transform hover:scale-105";
 const buttonCancelar = "bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-xl font-semibold shadow-md transition transform hover:scale-105";
 
 export default ModalUsuario;
