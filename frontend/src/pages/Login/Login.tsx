@@ -17,7 +17,6 @@ const Login: React.FC<LoginProps> = ({ mostrarRegistro, onLoginExitoso }) => {
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
   const [errorMensaje, setErrorMensaje] = useState("");
   const { t } = useIdioma();
-
   const [animar, setAnimar] = useState(false);
 
   useEffect(() => {
@@ -43,14 +42,23 @@ const Login: React.FC<LoginProps> = ({ mostrarRegistro, onLoginExitoso }) => {
 
       if (respuesta.ok && data.usuario) {
         const usuario: Usuario = data.usuario;
-        console.log("LOGIN EXITOSO:", usuario);
+
+        // Asignar rol válido
+        const rolValido: "usuario" | "administrador" = usuario.id === 3 ? "administrador" : "usuario";
+        usuario.rol = rolValido;
+
+        // Guardar en localStorage
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("rol", rolValido);
+        localStorage.setItem("usuario", JSON.stringify(usuario));
+
         onLoginExitoso(usuario);
       } else {
-        setErrorMensaje(data.error || "Correo o contraseña incorrectos");
+        setErrorMensaje(data.error || data.mensaje || "Correo o contraseña incorrectos");
       }
     } catch (error) {
+      console.error(error);
       setErrorMensaje("Error con el servidor. Intenta de nuevo");
-      console.error("ERROR SERVIDOR:", error);
     } finally {
       setLoading(false);
     }
@@ -58,20 +66,17 @@ const Login: React.FC<LoginProps> = ({ mostrarRegistro, onLoginExitoso }) => {
 
   return (
     <div
-      className="flex justify-center items-center w-full h-screen font-poppins bg-cover bg-center overflow-hidden"
-      style={{ backgroundImage: 'url(https://cdn.shopify.com/s/files/1/0742/6437/9704/files/blog_genesis_trabajo_1024x1024.png?v=1708552728)' }} 
+      className="flex justify-center items-center w-full min-h-screen font-poppins bg-cover bg-center overflow-hidden px-4"
+      style={{
+        backgroundImage:
+          'url(https://cdn.shopify.com/s/files/1/0742/6437/9704/files/blog_genesis_trabajo_1024x1024.png?v=1708552728)',
+      }}
     >
       <div
-        className={`bg-white/20 backdrop-blur-xl rounded-2xl p-10 max-w-sm w-full flex flex-col items-center shadow-xl border border-white/30 transition-all duration-700
+        className={`bg-white/20 backdrop-blur-xl rounded-2xl p-10 max-w-[380px] w-full flex flex-col items-center shadow-xl border border-white/30 transition-all duration-700
         ${animar ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
       >
-        {/* Logo */}
-        <img
-          src="/Logito.jpeg"
-          alt="Logo Huellitas"
-          className="w-24 h-24 mb-4"
-        />
-
+        <img src="/LOGITO (2).jpeg" alt="Logo Huellitas" className="w-24 h-24 mb-4" />
         <h2 className="text-3xl font-bold text-gray-900 mb-1 text-center">
           {t("Bienvenido a Huellitas")}
         </h2>
@@ -110,7 +115,7 @@ const Login: React.FC<LoginProps> = ({ mostrarRegistro, onLoginExitoso }) => {
           <button
             type="submit"
             disabled={loading}
-            className="bg-linear-to-r from-[#E6A84E] to-[#8C5E3C] text-white py-3 rounded-md font-semibold shadow-md"
+            className="bg-linear-to-r from-[#77f5e0] to-[#3c8c77] text-white py-3 rounded-md font-semibold shadow-md"
           >
             {loading ? t("Cargando...") : t("Iniciar Sesión")}
           </button>
