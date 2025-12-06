@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  FaUserShield,
-  FaUser,
-  FaIdCard,
-  FaEnvelope,
-  FaLock,
-} from "react-icons/fa";
+import {FaUserShield,FaUser,FaIdCard,FaEnvelope,FaLock,} from "react-icons/fa";
 import { MdPhoneIphone } from "react-icons/md";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebookF, FaApple } from "react-icons/fa";
@@ -108,12 +102,12 @@ const Registro: React.FC<RegistroProps> = ({ mostrarLogin }) => {
         }}
       />
 
-      {/* Contenedor */}
+      {/* el contenedor */}
       <div
         className={`relative z-10 flex flex-col items-center w-full max-w-4xl p-8 md:p-10 rounded-2xl bg-white/20 backdrop-blur-xl border border-[#DB752E74] shadow-lg transition-all duration-700
         ${animar ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
       >
-        {/* Título */}
+        {/* Título :) */}
         <h2
           className={`flex items-center text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg mb-2 transition-all duration-700
           ${animar ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
@@ -121,7 +115,7 @@ const Registro: React.FC<RegistroProps> = ({ mostrarLogin }) => {
           <FaUserShield className="mr-3" /> {translate("Registro de Usuario")}
         </h2>
 
-        {/* Subtítulo */}
+        {/* Subtítulo -- */}
         <p
           className={`text-white text-lg md:text-xl drop-shadow-md mb-6 text-center transition-all duration-700 delay-100
           ${animar ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
@@ -131,7 +125,7 @@ const Registro: React.FC<RegistroProps> = ({ mostrarLogin }) => {
 
         {/* Formulario */}
         <form className="flex flex-col gap-4 w-full" onSubmit={handleRegistro}>
-          {/* Fila 1: nombres */}
+          {/* F1: nombres */}
           <div className="flex flex-wrap gap-4 md:flex-row md:gap-6">
             <InputIcon
               icon={<FaUser />}
@@ -162,7 +156,7 @@ const Registro: React.FC<RegistroProps> = ({ mostrarLogin }) => {
             />
           </div>
 
-          {/* Fila 2: CI, teléfono, correo */}
+          {/* F2: CI, teléfono, correo */}
           <div className="flex flex-wrap gap-4 md:flex-row md:gap-6 items-center">
             <InputIcon
               icon={<FaIdCard />}
@@ -178,7 +172,7 @@ const Registro: React.FC<RegistroProps> = ({ mostrarLogin }) => {
             >
               <button
                 type="button"
-                className="bg-[#e9a154e0] text-black font-bold px-2 py-1 rounded"
+                className="bg-[#7cedcde0] text-black font-bold px-2 py-1 rounded"
               >
                 +591
               </button>
@@ -205,7 +199,7 @@ const Registro: React.FC<RegistroProps> = ({ mostrarLogin }) => {
             />
           </div>
 
-          {/* Fila 3: contraseña y género */}
+          {/* F3: contraseña y género */}
           <div className="flex flex-wrap gap-4 md:flex-row md:gap-6 items-center">
             <InputIcon
               icon={<FaLock />}
@@ -238,10 +232,10 @@ const Registro: React.FC<RegistroProps> = ({ mostrarLogin }) => {
             </select>
           </div>
 
-          {/* Botón Crear cuenta */}
+          {/* Botón para la crear cuenta */}
           <button
             type="submit"
-            className={`w-full bg-linear-to-r from-[#E6A84E] to-[#8C5E3C] text-white py-3 rounded-md font-semibold shadow-md 
+            className={`w-full bg-linear-to-r from-[#4ee6c0] to-[#3c8c68d4] text-white py-3 rounded-md font-semibold shadow-md 
               hover:scale-105 hover:brightness-110 transition-all duration-700
               ${animar ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
           >
@@ -249,7 +243,7 @@ const Registro: React.FC<RegistroProps> = ({ mostrarLogin }) => {
           </button>
         </form>
 
-        {/* Social login */}
+        {/*login */}
         <p
           className={`text-white mt-3 text-center transition-all duration-700 delay-100 ${
             animar ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
@@ -307,7 +301,6 @@ const Registro: React.FC<RegistroProps> = ({ mostrarLogin }) => {
   );
 };
 
-// Componente Input con icono y animación
 const InputIcon: React.FC<{
   icon: React.ReactNode;
   placeholder: string;
