@@ -31,7 +31,7 @@ const AREAS = [
 
 const VoluntariosUsuario: React.FC = () => {
   const { t: translate } = useIdioma();
-  const [animar, setAnimar] = useState(false);
+  const [, setAnimar] = useState(false);
   const [confeti, setConfeti] = useState(false);
 
   useEffect(() => {
@@ -53,10 +53,22 @@ const VoluntariosUsuario: React.FC = () => {
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
 
+  // Validaciones en inputs
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+
+    // Nombres y apellidos solo letras y espacios
+    if (["nombre", "apellido_paterno", "apellido_materno"].includes(name)) {
+      if (!/^[a-zA-ZÀ-ÿ\s]*$/.test(value)) return;
+    }
+
+    // Teléfono solo números, máximo 8
+    if (name === "telefono") {
+      if (!/^\d{0,8}$/.test(value)) return;
+    }
+
     setForm({ ...form, [name]: value });
   };
 
@@ -64,20 +76,41 @@ const VoluntariosUsuario: React.FC = () => {
     e.preventDefault();
     setMensaje(null);
 
+    // Validaciones
     if (
       !form.nombre.trim() ||
       !form.apellido_paterno.trim() ||
+      !form.apellido_materno.trim() ||
       !form.correo_electronico.trim()
     ) {
-      setMensaje("Por favor completa tu nombre, apellido paterno y correo.");
+      setMensaje("Por favor completa tu nombre, apellidos y correo.");
+      return;
+    }
+
+    if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(form.nombre)) {
+      setMensaje("El nombre solo puede contener letras.");
+      return;
+    }
+    if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(form.apellido_paterno)) {
+      setMensaje("El apellido paterno solo puede contener letras.");
+      return;
+    }
+    if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(form.apellido_materno)) {
+      setMensaje("El apellido materno solo puede contener letras.");
+      return;
+    }
+    if (form.telefono && !/^\d{8}$/.test(form.telefono)) {
+      setMensaje("El teléfono debe tener exactamente 8 números.");
       return;
     }
 
     try {
       setCargando(true);
-      await axios.post(`${API_URL}/voluntarios/crear-voluntario`, form);
-      setMensaje("¡Gracias por unirte a nuestro equipo de voluntarios!");
+      const { data } = await axios.post(`${API_URL}/voluntarios/crear-voluntario`, form);
+
+      setMensaje(data.message || "¡Gracias por unirte a nuestro equipo de voluntarios!");
       setConfeti(true);
+
       setForm({
         nombre: "",
         apellido_paterno: "",
@@ -89,10 +122,12 @@ const VoluntariosUsuario: React.FC = () => {
         areaAsignada: "",
         disponibilidad: "",
       });
+
       setTimeout(() => setConfeti(false), 5000);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setMensaje("Error al registrar. Intenta nuevamente.");
+      // Si el backend devuelve mensaje, úsalo
+      setMensaje(error.response?.data?.message || "Error al registrar. Intenta nuevamente.");
     } finally {
       setCargando(false);
     }
@@ -105,7 +140,7 @@ const VoluntariosUsuario: React.FC = () => {
 
   return (
     <div
-      className="w-full min-h-screen flex items-center justify-center bg-cover bg-center p-6"
+      className="w-full min-h-screen flex items-center justify-center bg-cover bg-center p-4"
       style={{
         backgroundImage:
           "url('https://www.tiendanimal.es/articulos/wp-content/uploads/2025/10/como-hacer-voluntariado-refugio-animales.jpg')",
@@ -116,148 +151,123 @@ const VoluntariosUsuario: React.FC = () => {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="flex flex-col lg:flex-row w-full max-w-6xl bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden"
-        style={{ minHeight: "80vh" }}
+        className="w-full max-w-5xl bg-white/90 backdrop-blur-md shadow-2xl rounded-xl overflow-hidden p-6"
+        style={{ minHeight: "70vh" }}
       >
-        {/* Formulario */}
-        <div className="lg:w-1/1 p-10 flex flex-col justify-center bg-white/0">
-          <h2 className="text-4xl lg:text-5xl font-bold text-black mb-6 text-center">
-            {translate("¡Hazte Voluntario!")}
-          </h2>
+        <h2 className="text-3xl lg:text-4xl font-bold text-black mb-6 text-center">
+          {translate("¡Hazte Voluntario!")}
+        </h2>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
-            <InputIcon
-              icon={<FaUser />}
-              placeholder={translate("Nombre")}
-              name="nombre"
-              value={form.nombre}
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-3"
+        >
+          <InputIcon
+            icon={<FaUser />}
+            placeholder={translate("Nombre")}
+            name="nombre"
+            value={form.nombre}
+            onChange={handleChange}
+          />
+          <InputIcon
+            icon={<FaUser />}
+            placeholder={translate("Apellido Paterno")}
+            name="apellido_paterno"
+            value={form.apellido_paterno}
+            onChange={handleChange}
+          />
+          <InputIcon
+            icon={<FaUser />}
+            placeholder={translate("Apellido Materno")}
+            name="apellido_materno"
+            value={form.apellido_materno}
+            onChange={handleChange}
+          />
+          <InputIcon
+            icon={<FaCalendarAlt />}
+            placeholder={translate("Fecha de nacimiento")}
+            name="fechaNacimiento"
+            type="date"
+            value={form.fechaNacimiento || ""}
+            onChange={handleChange}
+          />
+          <InputIcon
+            icon={<FaPhone />}
+            placeholder={translate("Teléfono")}
+            name="telefono"
+            type="tel"
+            value={form.telefono || ""}
+            onChange={handleChange}
+          />
+          <InputIcon
+            icon={<FaEnvelope />}
+            placeholder={translate("Correo electrónico")}
+            name="correo_electronico"
+            type="email"
+            value={form.correo_electronico || ""}
+            onChange={handleChange}
+          />
+          <InputIcon
+            icon={<FaUser />}
+            placeholder={translate("Dirección")}
+            name="direccion"
+            value={form.direccion || ""}
+            onChange={handleChange}
+          />
+
+          <div className="flex flex-col border border-teal-500 rounded-md p-1 bg-white/20 shadow-inner">
+            <label className="text-teal-500 font-medium text-sm mb-1">
+              {translate("Área de interés")}
+            </label>
+            <select
+              name="areaAsignada"
+              value={form.areaAsignada}
               onChange={handleChange}
-              animar={animar}
-            />
-
-            <InputIcon
-              icon={<FaUser />}
-              placeholder={translate("Apellido Paterno")}
-              name="apellido_paterno"
-              value={form.apellido_paterno}
-              onChange={handleChange}
-              animar={animar}
-            />
-
-            <InputIcon
-              icon={<FaUser />}
-              placeholder={translate("Apellido Materno")}
-              name="apellido_materno"
-              value={form.apellido_materno}
-              onChange={handleChange}
-              animar={animar}
-            />
-
-            <InputIcon
-              icon={<FaCalendarAlt />}
-              placeholder={translate("Fecha de nacimiento")}
-              name="fechaNacimiento"
-              type="date"
-              value={form.fechaNacimiento || ""}
-              onChange={handleChange}
-              animar={animar}
-            />
-
-            <InputIcon
-              icon={<FaPhone />}
-              placeholder={translate("Teléfono")}
-              name="telefono"
-              type="tel"
-              value={form.telefono || ""}
-              onChange={handleChange}
-              animar={animar}
-            />
-
-            <InputIcon
-              icon={<FaEnvelope />}
-              placeholder={translate("Correo electrónico")}
-              name="correo_electronico"
-              type="email"
-              value={form.correo_electronico || ""}
-              onChange={handleChange}
-              animar={animar}
-            />
-
-            <InputIcon
-              icon={<FaUser />}
-              placeholder={translate("Dirección")}
-              name="direccion"
-              value={form.direccion || ""}
-              onChange={handleChange}
-              animar={animar}
-            />
-
-            {/* Área de interés */}
-            <div
-              className={`flex flex-col border border-teal-500 rounded-lg p-2 bg-white/20 backdrop-blur-sm shadow-inner transition-all duration-900 ${
-                animar ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
+              className="p-1 rounded-md outline-none text-sm bg-white/20"
             >
-              <label className="text-teal-500 font-medium mb-1">
-                {translate("Área de interés")}
-              </label>
-              <select
-                name="areaAsignada"
-                value={form.areaAsignada}
-                onChange={handleChange}
-                className="p-2 rounded-lg outline-none bg-white/20"
-              >
-                <option value="">{translate("Selecciona un área")}</option>
-                {AREAS.map((area) => (
-                  <option key={area} value={area}>
-                    {area}
-                  </option>
-                ))}
-              </select>
-            </div>
+              <option value="">{translate("Selecciona un área")}</option>
+              {AREAS.map((area) => (
+                <option key={area} value={area}>
+                  {area}
+                </option>
+              ))}
+            </select>
+          </div>
 
-            {/* Disponibilidad */}
-            <div
-              className={`flex flex-col border border-teal-500 rounded-lg p-2 bg-white/20 backdrop-blur-sm shadow-inner transition-all duration-700 ${
-                animar ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
-            >
-              <label className="text-teal-500 font-medium mb-1">
-                {translate("Disponibilidad")}
-              </label>
-              <input
-                type="text"
-                placeholder={translate("Escribe tu disponibilidad")}
-                name="disponibilidad"
-                value={form.disponibilidad || ""}
-                onChange={handleChange}
-                className="p-2 rounded-lg outline-none bg-white/20"
-              />
-            </div>
+          <div className="flex flex-col border border-teal-500 rounded-md p-1 bg-white/20 shadow-inner">
+            <label className="text-teal-500 font-medium text-sm mb-1">
+              {translate("Disponibilidad")}
+            </label>
+            <input
+              type="text"
+              placeholder={translate("Escribe tu disponibilidad")}
+              name="disponibilidad"
+              value={form.disponibilidad || ""}
+              onChange={handleChange}
+              className="p-1 rounded-md outline-none text-sm bg-white/20"
+            />
+          </div>
 
-            <button
-              type="submit"
-              disabled={cargando}
-              className={`w-full bg-teal-500 hover:bg-teal-600 text-white py-3 rounded-md font-semibold shadow-md transition-all duration-500 ${
-                animar ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
-            >
-              {cargando ? translate("Enviando...") : translate("Registrarme")}
-            </button>
-          </form>
+          <button
+            type="submit"
+            disabled={cargando}
+            className="md:col-span-2 w-full bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-md font-semibold shadow-md transition-all"
+          >
+            {cargando ? translate("Enviando...") : translate("Registrarme")}
+          </button>
+        </form>
 
-          {mensaje && (
-            <p
-              className={`text-center font-semibold mt-4 p-2 rounded-lg ${
-                mensaje.includes("Gracias")
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}
-            >
-              {mensaje}
-            </p>
-          )}
-        </div>
+        {mensaje && (
+          <p
+            className={`text-center font-semibold mt-3 p-2 rounded-md text-sm ${
+              mensaje.includes("Gracias")
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {mensaje}
+          </p>
+        )}
       </motion.div>
     </div>
   );
@@ -270,7 +280,6 @@ interface InputIconProps {
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   type?: string;
-  animar?: boolean;
 }
 
 const InputIcon: React.FC<InputIconProps> = ({
@@ -280,27 +289,19 @@ const InputIcon: React.FC<InputIconProps> = ({
   value,
   onChange,
   type = "text",
-  animar = false,
 }) => (
-  <div
-    className={`relative flex items-center gap-4 border border-teal-500 rounded-lg px-4 py-2 bg-white/20 backdrop-blur-sm shadow-inner transition-all duration-700 ${
-      animar ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
-    }`}
-  >
-    <span className="text-black-700 text-lg">{icon}</span>
-
+  <div className="relative flex items-center gap-2 border border-teal-500 rounded-md px-3 py-1.5 bg-white/20 shadow-inner text-sm">
+    <span className="text-black text-base">{icon}</span>
     <input
       type={type}
       name={name}
       value={value}
       onChange={onChange}
-      className="w-full bg-transparent outline-none text-black text-base pt-4 pb-1"
+      className="w-full bg-transparent outline-none text-black text-sm pt-3 pb-1"
     />
-
-    {/* label flotante */}
     <label
-      className={`absolute left-12 transition-all duration-400 pointer-events-none ${
-        value ? "-top-1 text-xs text-black-700" : "top-3 text-base text-gray-600"
+      className={`absolute left-10 transition-all duration-300 pointer-events-none ${
+        value ? "-top-1 text-xs text-black" : "top-2 text-sm text-gray-600"
       }`}
     >
       {placeholder}
