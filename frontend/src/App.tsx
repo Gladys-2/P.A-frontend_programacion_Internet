@@ -35,7 +35,6 @@ const App: React.FC = () => {
   }, [i18n.language]);
 
   const handleLoginExitoso = (usuario: Usuario) => {
-    // Asignamos rol válido si viene nulo o undefined
     const rolValido: "usuario" | "administrador" =
       usuario.id === 3 ? "administrador" : "usuario";
 
@@ -43,10 +42,8 @@ const App: React.FC = () => {
 
     setUsuarioActual(usuarioConRol);
 
-    // Guardar en localStorage (opcional)
     localStorage.setItem("usuario", JSON.stringify(usuarioConRol));
 
-    // Cambiar pantalla según rol
     setPantalla(rolValido === "administrador" ? "inicioAdmin" : "inicio");
   };
 
@@ -64,13 +61,13 @@ const App: React.FC = () => {
         return <Usuarios usuarioLogueado={usuarioActual} />;
       case "reportes":
         return <ReportesAdmin />;
-      case "animalesAdmin":
+      case "animales":
         return <AnimalesAdmin usuarioLogueado={usuarioActual} />;
-      case "voluntariosAdmin":
+      case "voluntarios":
         return <VoluntariosAdmin usuarioLogueado={usuarioActual} />;
-      case "donacionesAdmin":
+      case "donaciones":
         return <TablaDonaciones />;
-      case "adopcionesAdmin":
+      case "adopciones":
         return <AdopcionesAdmin />;
       default:
         return <InicioAdmin usuario={usuarioActual} sidebarAbierto={sidebarAbierto} />;
@@ -109,7 +106,9 @@ const App: React.FC = () => {
         <main className="pt-0 px-0 w-full">
           {pantalla === "inicioPublico" && <InicioPublico sidebarAbierto={false} />}
           {pantalla === "login" && (
-            <Login mostrarRegistro={() => setPantalla("registro")} onLoginExitoso={handleLoginExitoso} />
+            <Login mostrarRegistro={() => setPantalla("registro")} onLoginExitoso={handleLoginExitoso} volverInicio={function (): void {
+              throw new Error("funcion no implementada .");
+            } } />
           )}
           {pantalla === "registro" && <Registro mostrarLogin={() => setPantalla("login")} />}
         </main>
