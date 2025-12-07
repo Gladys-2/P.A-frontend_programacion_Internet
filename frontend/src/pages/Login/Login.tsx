@@ -6,6 +6,7 @@ import type { Usuario } from "../../types/types";
 interface LoginProps {
   mostrarRegistro: () => void;
   onLoginExitoso: (usuario: Usuario) => void;
+  volverInicio: () => void;
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
